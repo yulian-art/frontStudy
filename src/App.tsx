@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
 import CourseCard from './components/CourseCard'
 import type { Course } from './types/course'
@@ -26,10 +26,58 @@ const initialCourses: Course[] = [
     completedLessons: 12,
   },
 ]
+  const COURSES_STORGAGE_KEY = 'frontstudy:courses:v1'
+  function isCourse(value:unknown):value is Course {
+    if(typeof value !== 'object' || value === null) return false
+
+    const course = value as Record<string, unknown>
+
+    return (
+    typeof course.id === 'string' &&
+    course.id.length > 0 &&
+    typeof course.title === 'string' &&
+    course.title.length > 0 &&
+    typeof course.totalLessons === 'number' &&
+    Number.isInteger(course.totalLessons) &&
+    course.totalLessons > 0 &&
+    typeof course.completedLessons === 'number' &&
+    Number.isInteger(course.completedLessons) &&
+    course.completedLessons >= 0 &&
+    course.completedLessons <= course.totalLessons
+  )
+  }
+  function loadCourses(): Course[] {
+    try {
+      const raw = localStorage.getItem(COURSES_STORGAGE_KEY)
+
+      if (raw === null) return initialCourses
+
+      const parsed: unknown = JSON.parse(raw)
+
+      if(Array.isArray(parsed) && parsed.every(isCourse)) {
+        return parsed as Course[]
+      }
+    } catch (error) {
+      console.warn('读取课程失败', error)
+    }
+
+    return initialCourses
+  }
 
 export default function App(){
   const [filter, setFilter] = useState<CourseFilter>('all')
-  const [courses, setCourses] = useState<Course[]>(initialCourses)
+  const [courses, setCourses] = useState<Course[]>(loadCourses)
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(COURSES_STORGAGE_KEY, JSON.stringify(courses))
+    } catch (error) {
+      console.warn('保存课程失败', error)
+    }
+  }, [courses])
+
+
+
   function handleCompleteLesson(CourseID : string) {
     setCourses((prevCourses) => 
     prevCourses.map((course)=>{
@@ -119,11 +167,6 @@ export default function App(){
     ))}
   </section>
 )}
-      <section className="course-list">
-        {courses.map((course)=>(
-          <CourseCard key={course.id} course={course} onCompleteLesson={handleCompleteLesson}/>
-        ))}
-      </section>
     </main>
   )
 }
