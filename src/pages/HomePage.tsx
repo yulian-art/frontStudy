@@ -3,7 +3,7 @@ import { Card, Select, Input } from 'antd'
 import { Link } from 'react-router'
 import { posts, type Post } from '../data/posts'
 import PostCard from '../components/PostCard'
-
+import { usePageTitle } from '../hooks/usePageTitle'
 type CategoryFliter = 'all' | Post['category']
 export default function HomePage() {
   const [categoryFilter, setCategoryFilter] = useState<CategoryFliter>('all')
@@ -19,6 +19,7 @@ export default function HomePage() {
 
     return matchesCategory && matchesKeyword
   })
+  usePageTitle('首页')
   return (
     <main className="mx-auto max-w-5xl px-6 py-10 sm:py-16">
       <section className="mt-10" aria-labelledby="latest-posts">

@@ -3,6 +3,7 @@ import '../App.css'
 import CourseCard from '../components/CourseCard'
 import type { Course } from '../types/course'
 import CourseForm from '../components/CourseForm'
+import { usePageTitle } from '../hooks/usePageTitle'
 
 type CourseFilter = 'all' | 'not-started' | 'learning' | 'completed'
 
@@ -116,7 +117,7 @@ export default function CoursesPage(){
   
 
 
-
+usePageTitle('课程学习')
   return (
     <main className="app">
       <h1 className="app__title">学习记录</h1>

@@ -3,7 +3,7 @@ import '../App.css'
 import { useState, useEffect } from 'react'
 import JobForm from '../components/JobForm'
 import { Select } from 'antd'
-
+import { usePageTitle } from '../hooks/usePageTitle'
 const initialJobs: Job[] = [
   {
     id: 'j-001',
@@ -87,6 +87,7 @@ export default function JobsPage() {
       prevJobs.map((job) => (job.id === id ? { ...job, status } : job)),
     )
   }
+  usePageTitle('求职记录')
   return (
     <main className="app">
       <h1 className="app__title">求职记录</h1>
