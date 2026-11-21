@@ -1,6 +1,6 @@
 import type { Job } from '../types/jobs'
 import '../App.css'
-import { useState,useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import JobForm from '../components/JobForm'
 import { Select } from 'antd'
 
@@ -28,8 +28,8 @@ const initialJobs: Job[] = [
 const statusLabels = {
   applied: '已投递',
   interviewing: '面试中',
-  offer : '已录用',
-  rejected : '未通过',
+  offer: '已录用',
+  rejected: '未通过',
 }
 
 const JOBS_STORAGE_KEY = 'frontstudy:jobs:v1'
@@ -38,7 +38,7 @@ function isJob(value: unknown): value is Job {
 
   const job = value as Record<string, unknown>
   return (
-    typeof job.id === 'string' && 
+    typeof job.id === 'string' &&
     typeof job.company === 'string' &&
     typeof job.position === 'string' &&
     typeof job.status === 'string' &&
@@ -61,62 +61,58 @@ function loadJobs(): Job[] {
 }
 
 export default function JobsPage() {
-
-// Dispatch<SetStateAction<Job[]>>
+  // Dispatch<SetStateAction<Job[]>>
   const [jobs, setJobs] = useState<Job[]>(loadJobs)
 
-  useEffect(()=> {
+  useEffect(() => {
     try {
       localStorage.setItem(JOBS_STORAGE_KEY, JSON.stringify(jobs))
-    }catch (error) {
+    } catch (error) {
       console.warn('读取求职记录失败', error)
     }
   }, [jobs])
 
-  function handleAddJob(company: string, position:string) {
+  function handleAddJob(company: string, position: string) {
     const newJob: Job = {
-      id : crypto.randomUUID(),
+      id: crypto.randomUUID(),
       company,
       position,
       status: 'applied',
     }
-    setJobs((prevJobs)=> [...prevJobs, newJob])
+    setJobs((prevJobs) => [...prevJobs, newJob])
   }
 
-
-  function handleChangeStatus(id:string , status: Job['status']){
+  function handleChangeStatus(id: string, status: Job['status']) {
     setJobs((prevJobs) =>
-     prevJobs.map((job) =>
-    job.id === id ? {...job, status} : job,
-  ))
+      prevJobs.map((job) => (job.id === id ? { ...job, status } : job)),
+    )
   }
   return (
     <main className="app">
       <h1 className="app__title">求职记录</h1>
 
-      <JobForm onAddJob={handleAddJob}/>
+      <JobForm onAddJob={handleAddJob} />
 
       <p>共{jobs.length}条投递记录</p>
-      
-      <section className='course-list'>
-        {jobs.map((job)=>(
-          <article className='course-card' key={job.id}>  
+
+      <section className="course-list">
+        {jobs.map((job) => (
+          <article className="course-card" key={job.id}>
             <h2>{job.company}</h2>
             <p>岗位：{job.position}</p>
             <label>
               投递状态
               <Select<Job['status']>
                 value={job.status}
-      style={{ width: 120 }}
-      onChange={(status)=> handleChangeStatus(job.id, status)}
-      options={[
-        { value: 'applied', label: statusLabels.applied },
-        { value: 'interviewing', label: statusLabels.interviewing },
-        { value: 'offer', label: statusLabels.offer },
-        { value: 'rejected', label: statusLabels.rejected },
-        
-      ]}
-    />
+                style={{ width: 120 }}
+                onChange={(status) => handleChangeStatus(job.id, status)}
+                options={[
+                  { value: 'applied', label: statusLabels.applied },
+                  { value: 'interviewing', label: statusLabels.interviewing },
+                  { value: 'offer', label: statusLabels.offer },
+                  { value: 'rejected', label: statusLabels.rejected },
+                ]}
+              />
             </label>
           </article>
         ))}
